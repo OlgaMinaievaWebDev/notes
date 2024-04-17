@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useEffect } from "react";
-import { nanoid } from "nanoid";
 import Sidebar from "./Sidebar";
 import Split from "react-split";
 import Editor from "./Editor";
@@ -11,6 +10,7 @@ import { db } from "./firebase";
 export default function App() {
   const [notes, setNotes] = useState([]);
   const [currentNoteId, setCurrentNoteId] = useState("");
+  const [tempNoteText, setTempNoteText] = useState("");
 
   const currentNote =
     notes.find((note) => {
@@ -36,6 +36,12 @@ export default function App() {
       setCurrentNoteId(notes[0]);
     }
   }, [notes]);
+
+  useEffect(() => {
+    if (currentNote) {
+      setTempNoteText(currentNote.body);
+    }
+  }, [currentNote]);
 
   async function createNewNote() {
     const newNote = {
@@ -73,7 +79,10 @@ export default function App() {
             deleteNote={deleteNote}
           />
 
-          <Editor currentNote={currentNote} updateNote={updateNote} />
+          <Editor
+            tempNoteText={tempNoteText}
+            setTempNoteText={setTempNoteText}
+          />
         </Split>
       ) : (
         <div className="no-notes">
