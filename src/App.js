@@ -21,7 +21,6 @@ export default function App() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(notesCollection, function (snapshot) {
-      // Sync up our local notes array with the snapshot data
       const notesArr = snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
@@ -33,7 +32,7 @@ export default function App() {
 
   useEffect(() => {
     if (!currentNoteId) {
-      setCurrentNoteId(notes[0]);
+      setCurrentNoteId(notes[0]?.id);
     }
   }, [notes]);
 
@@ -42,6 +41,15 @@ export default function App() {
       setTempNoteText(currentNote.body);
     }
   }, [currentNote]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (tempNoteText !== currentNote.body) {
+        updateNote(tempNoteText);
+      }
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [tempNoteText]);
 
   async function createNewNote() {
     const newNote = {
